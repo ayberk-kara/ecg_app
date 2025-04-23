@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:usb_serial/usb_serial.dart';
@@ -25,7 +24,7 @@ class MyApp extends StatelessWidget {
 }
 
 class USBDataScreen extends StatefulWidget {
-  const USBDataScreen({Key? key}) : super(key: key);
+  const USBDataScreen({super.key});
 
   @override
   State<USBDataScreen> createState() => _USBDataScreenState();
@@ -36,13 +35,23 @@ class _USBDataScreenState extends State<USBDataScreen> {
   UsbPort? _port;
   StreamSubscription<Uint8List>? _subscription;
   String _status = "No device connected";
-  String _receivedData = "";
 
-  List<int> _samples = [];
+  final List<String> leadNames = [
+    "I", "II", "III", "aVR", "aVL", "aVF",
+    "V1", "V2", "V3", "V4", "V5", "V6"
+  ];
+
+  final Map<String, List<int>> _leadSamples = {};
+  final List<int> _buffer = [];
+
+  static const int bufferLimit = 10000; // Python'daki BUFFER_SIZE
 
   @override
   void initState() {
     super.initState();
+    for (var lead in leadNames) {
+      _leadSamples[lead] = [];
+    }
     _listDevices();
   }
 
@@ -63,6 +72,7 @@ class _USBDataScreenState extends State<USBDataScreen> {
       });
       return;
     }
+
     await _port!.setDTR(true);
     await _port!.setRTS(true);
     await _port!.setPortParameters(
@@ -71,37 +81,35 @@ class _USBDataScreenState extends State<USBDataScreen> {
       UsbPort.STOPBITS_1,
       UsbPort.PARITY_NONE,
     );
+
     setState(() {
       _status = "Connected to ${device.productName}";
     });
 
     var inputStream = _port!.inputStream;
     if (inputStream != null) {
-      _subscription = inputStream.listen((Uint8List event) {
-        String decoded = utf8.decode(event);
-        debugPrint("Decoded: $decoded");
+      _subscription = inputStream.listen((Uint8List data) {
+        _buffer.addAll(data);
 
-        _receivedData += decoded;
+        while (_buffer.length >= 12) {
+          final oneSet = _buffer.sublist(0, 12);
+          _buffer.removeRange(0, 12);
 
-        // Prevent text widget from bloating
-        if (_receivedData.length > 5000) {
-          _receivedData = _receivedData.substring(_receivedData.length - 5000);
-        }
+          for (int i = 0; i < 12; i++) {
+            final lead = leadNames[i];
+            final value = oneSet[i];
 
-        List<String> tokens = decoded.split(RegExp(r'[\r\n\s]+'));
-        for (String token in tokens) {
-          if (token.isEmpty) continue;
-          int? sample = int.tryParse(token);
-          if (sample != null) {
-            _samples.add(sample);
-            if (_samples.length > 1000) {
-              _samples.removeRange(0, _samples.length - 1000);
+            final samples = _leadSamples[lead];
+            if (samples != null) {
+              samples.add(value);
+              if (samples.length > bufferLimit) {
+                samples.removeRange(0, samples.length - bufferLimit);
+              }
             }
           }
         }
 
-        debugPrint("Current sample count: ${_samples.length}");
-
+        // Ekranı sürekli güncelle, tıpkı Python'daki animasyon gibi
         setState(() {});
       });
     }
@@ -112,8 +120,10 @@ class _USBDataScreenState extends State<USBDataScreen> {
     await _port?.close();
     setState(() {
       _status = "Disconnected";
-      _receivedData = "";
-      _samples.clear();
+      _buffer.clear();
+      for (var lead in leadNames) {
+        _leadSamples[lead]?.clear();
+      }
     });
   }
 
@@ -136,8 +146,9 @@ class _USBDataScreenState extends State<USBDataScreen> {
             Text(_status, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed:
-              _devices.isNotEmpty ? () => _connectToDevice(_devices.first) : null,
+              onPressed: _devices.isNotEmpty
+                  ? () => _connectToDevice(_devices.first)
+                  : null,
               child: const Text("Connect to First Device"),
             ),
             const SizedBox(height: 10),
@@ -151,15 +162,20 @@ class _USBDataScreenState extends State<USBDataScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => ECGScreen(samples: _samples)),
+                    builder: (context) =>
+                        ECGScreen(leadData: Map.from(_leadSamples)),
+                  ),
                 );
               },
               child: const Text("Show ECG Screen"),
             ),
             const SizedBox(height: 20),
             Expanded(
-              child: SingleChildScrollView(
-                child: Text(_receivedData),
+              child: ListView(
+                children: leadNames
+                    .map((lead) => Text(
+                    "$lead: ${_leadSamples[lead]?.length ?? 0} samples"))
+                    .toList(),
               ),
             ),
           ],
