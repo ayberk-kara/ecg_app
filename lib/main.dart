@@ -42,9 +42,7 @@ class _USBDataScreenState extends State<USBDataScreen> {
   ];
 
   final Map<String, List<int>> _leadSamples = {};
-  final List<int> _buffer = [];
-
-  static const int bufferLimit = 10000; // Python'daki BUFFER_SIZE
+  static const int bufferLimit = 10000;
 
   @override
   void initState() {
@@ -89,27 +87,19 @@ class _USBDataScreenState extends State<USBDataScreen> {
     var inputStream = _port!.inputStream;
     if (inputStream != null) {
       _subscription = inputStream.listen((Uint8List data) {
-        _buffer.addAll(data);
+        // DEBUG: Gelen her byte için log
+        debugPrint("Received: ${data.map((e) => e.toRadixString(16).padLeft(2, '0')).join(' ')}");
 
-        while (_buffer.length >= 12) {
-          final oneSet = _buffer.sublist(0, 12);
-          _buffer.removeRange(0, 12);
-
-          for (int i = 0; i < 12; i++) {
-            final lead = leadNames[i];
-            final value = oneSet[i];
-
-            final samples = _leadSamples[lead];
-            if (samples != null) {
-              samples.add(value);
-              if (samples.length > bufferLimit) {
-                samples.removeRange(0, samples.length - bufferLimit);
-              }
+        for (var value in data) {
+          final samples = _leadSamples["I"];
+          if (samples != null) {
+            samples.add(value);
+            if (samples.length > bufferLimit) {
+              samples.removeRange(0, samples.length - bufferLimit);
             }
           }
         }
 
-        // Ekranı sürekli güncelle, tıpkı Python'daki animasyon gibi
         setState(() {});
       });
     }
@@ -120,7 +110,6 @@ class _USBDataScreenState extends State<USBDataScreen> {
     await _port?.close();
     setState(() {
       _status = "Disconnected";
-      _buffer.clear();
       for (var lead in leadNames) {
         _leadSamples[lead]?.clear();
       }

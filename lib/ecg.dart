@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:math';
 
 class ECGScreen extends StatefulWidget {
   final Map<String, List<int>> leadData;
@@ -13,17 +15,19 @@ class _ECGScreenState extends State<ECGScreen> with SingleTickerProviderStateMix
     "I", "II", "III", "aVR", "aVL", "aVF",
     "V1", "V2", "V3", "V4", "V5", "V6"
   ];
-  final TransformationController _controller = TransformationController();
   late final AnimationController _animationController;
+  double scrollOffset = 0.0;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2),
+      duration: const Duration(milliseconds: 16),
     )..addListener(() {
-      setState(() {});
+      setState(() {
+        scrollOffset += 1.2;
+      });
     });
     _animationController.repeat();
   }
@@ -36,7 +40,7 @@ class _ECGScreenState extends State<ECGScreen> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    final double canvasWidth = 2500;
+    final double canvasWidth = 10000;
     final double rowHeight = 200;
     final double verticalSpacing = 40;
     final double canvasHeight = (rowHeight + verticalSpacing) * leadNames.length;
@@ -46,23 +50,20 @@ class _ECGScreenState extends State<ECGScreen> with SingleTickerProviderStateMix
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: InteractiveViewer(
-                transformationController: _controller,
-                minScale: 0.5,
-                maxScale: 5.0,
-                boundaryMargin: const EdgeInsets.all(double.infinity),
-                child: CustomPaint(
-                  size: Size(canvasWidth, canvasHeight),
-                  painter: ECGPainter(
-                    leadNames: leadNames,
-                    leadData: widget.leadData,
-                    canvasWidth: canvasWidth,
-                    rowHeight: rowHeight,
-                    verticalSpacing: verticalSpacing,
-                    maxSamples: 10000,
-                  ),
+            child: InteractiveViewer(
+              constrained: false,
+              minScale: 1,
+              maxScale: 1,
+              child: CustomPaint(
+                size: Size(canvasWidth, canvasHeight),
+                painter: ECGPainter(
+                  leadNames: leadNames,
+                  leadData: widget.leadData,
+                  canvasWidth: canvasWidth,
+                  rowHeight: rowHeight,
+                  verticalSpacing: verticalSpacing,
+                  maxSamples: 10000,
+                  scrollOffset: scrollOffset,
                 ),
               ),
             ),
@@ -70,8 +71,8 @@ class _ECGScreenState extends State<ECGScreen> with SingleTickerProviderStateMix
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: () => _controller.value = Matrix4.identity(),
-              child: const Text("Reset Zoom/Pan"),
+              onPressed: () => setState(() => scrollOffset = 0.0),
+              child: const Text("Reset View"),
             ),
           ),
         ],
@@ -87,6 +88,7 @@ class ECGPainter extends CustomPainter {
   final double rowHeight;
   final double verticalSpacing;
   final int maxSamples;
+  final double scrollOffset;
 
   ECGPainter({
     required this.leadNames,
@@ -95,6 +97,7 @@ class ECGPainter extends CustomPainter {
     required this.rowHeight,
     required this.verticalSpacing,
     required this.maxSamples,
+    required this.scrollOffset,
   });
 
   @override
@@ -116,7 +119,7 @@ class ECGPainter extends CustomPainter {
 
       Path path = Path();
       for (int j = 0; j < visible.length; j++) {
-        double x = j * spacing;
+        double x = j * spacing - scrollOffset;
         double y = baseline - (visible[j] - 128) * 1.2;
         if (j == 0) {
           path.moveTo(x, y);
@@ -147,7 +150,7 @@ class ECGPainter extends CustomPainter {
   }
 
   void _drawUnifiedGrid(Canvas canvas, Size size) {
-    const double smallSquare = 12.5; // Kitapla uyumlu kare boyutu
+    const double smallSquare = 12.5;
     const double bigSquare = smallSquare * 5;
 
     Paint smallPaint = Paint()
