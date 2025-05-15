@@ -100,9 +100,25 @@ class ECGPainter extends CustomPainter {
     required this.scrollOffset,
   });
 
+  // Simple 3-point moving average filter
+  List<double> smoothSamples(List<int> rawSamples) {
+    if (rawSamples.length < 3) {
+      return rawSamples.map((e) => e.toDouble()).toList();
+    }
+
+    List<double> smoothed = [];
+    for (int i = 1; i < rawSamples.length - 1; i++) {
+      double avg = (rawSamples[i - 1] + rawSamples[i] + rawSamples[i + 1]) / 3.0;
+      smoothed.add(avg);
+    }
+    return smoothed;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
     _drawUnifiedGrid(canvas, size);
+
+    const double scaleFactor = 0.8;
 
     for (int i = 0; i < leadNames.length; i++) {
       String lead = leadNames[i];
@@ -110,17 +126,18 @@ class ECGPainter extends CustomPainter {
       double baseline = rowOffset + rowHeight / 2;
 
       List<int> samples = leadData[lead] ?? [];
-      if (samples.isEmpty) continue;
+      if (samples.length < 3) continue;
 
       int startIndex = samples.length > maxSamples ? samples.length - maxSamples : 0;
-      List<int> visible = samples.sublist(startIndex);
+      List<int> visibleRaw = samples.sublist(startIndex);
+      List<double> visible = smoothSamples(visibleRaw);
 
       double spacing = canvasWidth / maxSamples;
 
       Path path = Path();
       for (int j = 0; j < visible.length; j++) {
         double x = j * spacing - scrollOffset;
-        double y = baseline - (visible[j] - 128) * 1.2;
+        double y = baseline + (visible[j] - 128) * scaleFactor;
         if (j == 0) {
           path.moveTo(x, y);
         } else {

@@ -87,12 +87,14 @@ class _USBDataScreenState extends State<USBDataScreen> {
     var inputStream = _port!.inputStream;
     if (inputStream != null) {
       _subscription = inputStream.listen((Uint8List data) {
-        // DEBUG: Gelen her byte için log
-        debugPrint("Received: ${data.map((e) => e.toRadixString(16).padLeft(2, '0')).join(' ')}");
+        // DEBUG: Gelen byte'ları hex formatında terminale yaz
+        final hexDump = data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+        debugPrint("Received bytes: $hexDump");
 
-        for (var value in data) {
-          final samples = _leadSamples["I"];
-          if (samples != null) {
+        // Sadece lead "I" için veriyi ekle
+        final samples = _leadSamples["I"];
+        if (samples != null) {
+          for (final value in data) {
             samples.add(value);
             if (samples.length > bufferLimit) {
               samples.removeRange(0, samples.length - bufferLimit);
