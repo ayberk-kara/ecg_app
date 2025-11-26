@@ -138,7 +138,7 @@ If using another format, update the parser in main.dart.
 
 
 
-🙏 Acknowledgements
+## 🙏 Acknowledgements
 Special thanks to:
 
 Sabancı University Faculty of Engineering
