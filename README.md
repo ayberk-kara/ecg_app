@@ -1,9 +1,7 @@
 # ENS492 – Graduation Project  
 ## Real-Time 12-Lead ECG/Cardiogoniometry Viewer for Mobile Devices
 
-<p align="center">
-  <img src="screenshots/live_plot.png" width="70%">
-</p>
+
 
 This repository contains the Flutter-based mobile application developed as part of the ENS 492 Graduation Project at Sabancı University.  
 The app provides real-time visualization of 12-lead ECG data, entirely offline, running on any Android smartphone.
@@ -69,10 +67,6 @@ The app provides real-time visualization of 12-lead ECG data, entirely offline, 
 - < 40 ms USB-to-screen latency  
 - Stable 60 FPS on Snapdragon 845
 
-<p align="center">
-  <img src="screenshots/live_view.png" width="45%">
-  <img src="screenshots/pdf_result.png" width="45%">
-</p>
 
 ---
 
