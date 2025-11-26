@@ -1,16 +1,16 @@
- 🩺 ENS492 – Graduation Project  
+# ENS492 – Graduation Project  
 ## Real-Time 12-Lead ECG/Cardiogoniometry Viewer for Mobile Devices
 
 <p align="center">
   <img src="screenshots/live_plot.png" width="70%">
 </p>
 
-This repository contains the **Flutter-based mobile application** developed as part of the **ENS 492 – Graduation Project** at Sabancı University.  
-The app provides **real-time visualization of 12-lead ECG data**, operating fully **offline** on **any Android smartphone** with smooth, medically accurate rendering.
+This repository contains the Flutter-based mobile application developed as part of the ENS 492 Graduation Project at Sabancı University.  
+The app provides real-time visualization of 12-lead ECG data, entirely offline, running on any Android smartphone.
 
 ---
 
-## 📌 Project Info
+## Project Info
 
 - **Project Title:** Development of a Mobile Application for ECG/Cardiogoniometry Data Display & Analysis  
 - **Course:** ENS 492 – Graduation Project  
@@ -20,56 +20,54 @@ The app provides **real-time visualization of 12-lead ECG data**, operating full
 
 ---
 
-## 🧠 Why We Did This
+## Why We Did This
 
-- Cardiovascular diseases are the **#1 global cause of death**.  
-- **12-lead ECG** is the clinical gold standard, but current machines are bulky and expensive.  
-- Most mobile solutions:
-  - Show **only 1–2 leads**
-  - Require **cloud upload**, causing **latency + privacy risks**  
-- Our goal: A **hand-held, multi-lead, offline** ECG viewer that works on everyday smartphones.
-
----
-
-## 🎯 Key Objectives
-
-- ≥ **250 samples/sec/lead**, sustained for **20 minutes with zero packet drops**
-- **12-lead real-time plotting @ 60 FPS** on mid-range Android devices
-- Medically familiar **calibrated grid**, smooth **pan/zoom**, pause/inspect
-- **Offline-only**, APK ≤ 50 MB
-- Designed for **non-technical staff**, human-centered usability
-- Compliant with **GDPR / HIPAA** design principles
+- Cardiovascular diseases are the #1 global cause of death.  
+- 12-lead ECG is the clinical gold standard, but current machines are bulky and expensive.  
+- Existing mobile apps typically:  
+  - show only 1–2 leads  
+  - require cloud upload → latency + privacy risks  
+- Goal: handheld, multi-lead, offline ECG visualizer for any smartphone.
 
 ---
 
-## 🧩 Hardware
+## Key Objectives
 
-- **ADS1292R** – biopotential front-end (dual-channel)  
-- **STM32F103** MCU with TinyUSB CDC  
-- **PETG 3D-printed enclosure**  
-- **IEC 60601-inspired** analog layout  
-- Powered directly from phone (**≤ 80 mA**)  
-
----
-
-## 💻 Software
-
-- **Flutter / Dart** frontend  
-- Custom **ECG Grid + Waveform Engine** (CustomPainter)  
-- **Moving Average + IIR Band-Pass Filters**  
-- No native code, no cloud, no backend, no database  
-- Completely **offline and portable**
+- ≥ 250 samples/sec per lead for 20 minutes with zero packet drops  
+- 12-lead plotting at 60 FPS on mid-range Android  
+- Calibrated medical ECG grid with smooth pan/zoom  
+- APK ≤ 50 MB, battery-friendly  
+- GDPR/HIPAA-conscious design  
 
 ---
 
-## 📱 Mobile App Highlights
+## Hardware
 
-- 📡 **Live USB connection** & sample counter  
-- 🩺 **Real-time 12-lead ECG plot** on medical grid  
-- 🔍 Swipe to scroll, pinch-to-zoom, and **Jump-to-Tail (Live Mode)**  
-- 📄 **PDF export** for 10-second ECG snapshots  
-- ⚡ **< 40 ms latency** from USB → screen  
-- 🎯 Stable **60 FPS** on Snapdragon 845  
+- ADS1292R biopotential front-end  
+- STM32F103 MCU with TinyUSB (CDC)  
+- PETG 3D-printed enclosure  
+- IEC-inspired analog signal layout  
+- Powered from phone (≤ 80 mA)
+
+---
+
+## Software
+
+- Flutter/Dart frontend  
+- CustomPainter ECG grid and waveform engine  
+- Moving Average + IIR filters  
+- No backend, no cloud, no native code  
+
+---
+
+## Mobile App Highlights
+
+- Live USB connection & sample counter  
+- Real-time 12-lead ECG on calibrated grid  
+- Pinch-to-zoom, swipe scroll, “Jump to Tail” live mode  
+- PDF export (10-second snapshot)  
+- < 40 ms USB-to-screen latency  
+- Stable 60 FPS on Snapdragon 845
 
 <p align="center">
   <img src="screenshots/live_view.png" width="45%">
@@ -78,72 +76,60 @@ The app provides **real-time visualization of 12-lead ECG data**, operating full
 
 ---
 
-## 📊 Performance & Validation
+## Performance & Validation
 
 | Metric | Result |
 |--------|--------|
-| Packet drops (20 min) | **0** |
-| Long-term drift (8h soak test) | **< 0.02%** |
-| Rendering FPS | **60 FPS stable** |
-| CPU Usage | **< 35%** |
-| Power Draw | **≤ 80 mA** |
-| PDF Export (10s) | **< 1.5 sec** |
-| End-to-end latency | **< 40 ms** |
+| Packet drops (20 min) | 0 |
+| Drift (8-hour soak test) | < 0.02% |
+| Rendering FPS | 60 FPS |
+| CPU Usage | < 35% |
+| Power Draw | ≤ 80 mA |
+| PDF Export | < 1.5 sec |
+| USB → Screen Latency | < 40 ms |
 
 ---
 
-## 🧪 Results & Discussion
+## Results & Discussion
 
-- ✅ All core goals achieved  
-- ✅ USB chosen over Wi-Fi → **deterministic, robust** performance  
-- ✅ Flutter validated for **high-performance biomedical graphics**  
-- ⚠️ Limitations: fixed grid scaling, synthetic data used, power profiling pending  
-- ⭐ Possibly the **first open-source, cross-platform, fully-offline mobile 12-lead ECG renderer**
-
----
-
-## 🔬 Scientific & Technical Impact
-
-- **Scientific:** Establishes baseline for real-time mobile ECG visualization  
-- **Socio-economic:** **<$100 BOM** → affordable community screening  
-- **Engineering:** Demonstrates Flutter viability for high-fidelity medical UIs  
-- **Process:** Agile sprints outperformed top-down planning in debugging cycles  
+- All core goals achieved  
+- USB streaming proved more robust than Wi-Fi  
+- Flutter successfully delivered high-performance biomedical UI  
+- Limitations: fixed grid scaling, synthetic dataset, no full power profiling  
+- Likely one of the first open-source fully offline 12-lead ECG renderers  
 
 ---
 
-## 🔮 Next Steps
+## Scientific & Technical Impact
 
-- 🔁 Adaptive grid scaling (DPI-aware)  
-- 📉 On-device arrhythmia detection (TensorFlow Lite)  
-- 🧪 Clinical validation with patient data  
-- 🔋 Power profiling & optimizations  
+- Scientific: establishes mobile ECG performance baseline  
+- Socio-economic: <$100 hardware → accessible community screening  
+- Engineering: demonstrates Flutter capability for medical-grade graphics  
+- Development: agile iteration outperformed top-down planning  
 
 ---
 
-## 📦 How to Run
+## Next Steps
 
-```bash
-flutter pub get
-flutter run
-Expected Data Format
-Your ECG hardware must stream:
+- Adaptive DPI-aware grid scaling  
+- On-device arrhythmia detection (TFLite)  
+- Clinical validation with real patient data  
+- Power profiling & optimizations  
 
-12 bytes per sample
+---
 
-1 byte per lead
+## License
 
-Every 2 ms (≈ 500 Hz)
+This project is open-source under the MIT License.
 
-If using another format, update the parser in main.dart.
+---
 
+## Acknowledgements
 
-
-## 🙏 Acknowledgements
 Special thanks to:
 
-Sabancı University Faculty of Engineering
+- Sabancı University Faculty of Engineering  
+- **Prof. Dr. Ayhan Bozkurt** (Supervisor)  
+- All testers, reviewers, and contributors  
 
-Prof. Dr. Ayhan Bozkurt (Supervisor)
-
-All testers, reviewers & contributors
-
+> “This app turns a smartphone into a portable ECG machine — no cloud, no hospital, just signal and screen.”
