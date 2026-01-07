@@ -10,10 +10,7 @@ The app provides real-time visualization of 12-lead ECG data, entirely offline, 
 
 ## Project Info
 
-- **Project Title:** Development of a Mobile Application for ECG/Cardiogoniometry Data Display & Analysis  
-- **Course:** ENS 492 – Graduation Project  
-- **Student:** Ayberk Kara  
-- **Supervisor:** Prof. Dr. Ayhan Bozkurt  
+- **Project Title:** Development of a Mobile Application for ECG/Cardiogoniometry Data Display & Analysis   
 - **Date:** 19.05.2025  
 
 ---
