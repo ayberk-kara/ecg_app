@@ -50,9 +50,7 @@ The app provides real-time visualization of 12-lead ECG data, entirely offline, 
 
 - Flutter/Dart frontend  
 - CustomPainter ECG grid and waveform engine  
-- Moving Average + IIR filters  
-- No backend, no cloud, no native code  
-
+- Moving Average + IIR filters   
 ---
 
 ## Mobile App Highlights
@@ -109,18 +107,4 @@ The app provides real-time visualization of 12-lead ECG data, entirely offline, 
 
 ---
 
-## License
 
-This project is open-source under the MIT License.
-
----
-
-## Acknowledgements
-
-Special thanks to:
-
-- Sabancı University Faculty of Engineering  
-- **Prof. Dr. Ayhan Bozkurt** (Supervisor)  
-- All testers, reviewers, and contributors  
-
-> “This app turns a smartphone into a portable ECG machine — no cloud, no hospital, just signal and screen.”
